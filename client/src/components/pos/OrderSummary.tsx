@@ -28,7 +28,7 @@ export default function OrderSummary({
   onClearCart,
   onCheckout,
 }: OrderSummaryProps) {
-  const subtotal = cartItems.reduce(
+  const subtotal = (cartItems || []).reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
