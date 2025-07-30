@@ -1,0 +1,180 @@
+Project Overview:
+Build a web-based Point-of-Sale (POS) application tailored to food trucks and micro-restaurants. The app must be cross-platform, supporting web, iOS, and Android via a single codebase. It should emphasize a user-friendly, minimalist interface inspired by modern iOS and Material guidelines, ensuring simplicity, consistency, and accessibility. Performance must be top-notch, with fast load times, offline capability, and real-time syncing.
+
+Tech Stack Requirements:
+
+Front End:
+
+Use React for the web interface, applying a modular component architecture (e.g., React/Next.js).
+
+For mobile apps, use React Native (or optionally Flutter) to share components across iOS and Android.
+
+Implement state management (e.g., Redux Toolkit or React Context) and React Query (or SWR) for data fetching and caching.
+
+Include theming with light/dark modes, high-contrast color schemes, and responsive layouts.
+
+Backend & API:
+
+Implement a Node.js server (Express or Fastify) with TypeScript for type safety.
+
+Use a PostgreSQL database for structured data (sales, inventory, users). Incorporate MongoDB or Redis to handle real-time transaction logs and offline caching.
+
+Expose a GraphQL API (via Apollo Server or similar) to allow flexible querying and mutation from the front end.
+
+Implement JWT-based authentication with role-based access control (cashier, manager, admin).
+
+Ensure modular microservices architecture for scalability: separate services for orders, payments, inventory, user management, and analytics.
+
+Deployment & DevOps:
+
+Containerize services using Docker. Use Kubernetes (or AWS ECS) for orchestration.
+
+Deploy to AWS or Google Cloud with CI/CD pipelines (GitHub Actions or GitLab CI).
+
+Use a CDN for static assets, and edge caching for global performance.
+
+Offline-first and Real-time Synchronization:
+
+Incorporate service workers on the web side and local storage (IndexedDB) or SQLite in mobile apps to enable offline order creation.
+
+Queue unsynced transactions and provide a background sync mechanism to push data once connectivity resumes.
+
+Use WebSockets or Server-Sent Events for real-time updates to the front end (e.g., kitchen display status changes).
+
+Core Features:
+
+Sales & Payment:
+
+Accept multiple payment methods: chip, tap/NFC (Apple Pay, Google Pay), manual card entry, and QR code payments.
+
+Support split bills, partial payments, tips, discounts, and refunds.
+
+Incorporate a payment processor integration (e.g., Stripe or a pluggable processor).
+
+Ensure PCI DSS compliance and secure handling of card data.
+
+Order Management & Kitchen Workflow:
+
+UI for quick order entry with customizable menu items, modifiers, and combos.
+
+Real-time kitchen display system (KDS) showing incoming orders with statuses (e.g., pending, in progress, ready).
+
+Ability to assign, sort, or filter orders by course or preparation area.
+
+Inventory Management:
+
+Track ingredients and finished products in real-time.
+
+Automate low-stock alerts and create purchase orders.
+
+Include batch and expiration tracking for perishable goods.
+
+Customer Directory & Loyalty:
+
+Build customer profiles automatically (name, contact, purchase history).
+
+Implement loyalty programs (points-based or tiered rewards).
+
+Provide digital receipts and optional marketing consent capture.
+
+Reporting & Analytics:
+
+Dashboards showing sales metrics (total sales, average order size, best-selling items, busiest hours).
+
+Inventory reports (stock-on-hand, fast-moving SKUs, food cost percentage).
+
+Employee performance reports (sales per employee, hours worked).
+
+Export data to CSV/Excel or integrate with accounting platforms (e.g., QuickBooks).
+
+Multi-Location & Device Support:
+
+Allow a single account to manage multiple trucks or locations.
+
+Provide unified or per-location dashboards and reports.
+
+Unlimited device logins for staff.
+
+User Management & Permissions:
+
+Role-based access control (cashier, manager, admin).
+
+PIN or fingerprint authentication (mobile devices).
+
+Track employee hours, breaks, and clock-in/out times.
+
+Simple Self-Onboarding:
+
+Guided setup with optional sample menus.
+
+Ability to import menu items via CSV.
+
+Month-to-month subscription management (no long-term contract requirement).
+
+Advanced & Modular Features (Optional Paid Modules):
+
+Advanced Inventory & Costing: Ingredient-level tracking, recipe management, yield calculations, and profit margin calculators.
+
+Marketing & Loyalty Suite: Automated email/SMS campaigns, reward tiers, targeted promotions based on purchase patterns.
+
+Multi-Truck Dispatch & Scheduling: Assign trucks to locations, route management, and real-time location tracking.
+
+Integration Hub: Connectors for accounting (QuickBooks, Xero), eCommerce/delivery platforms, and CRM tools.
+
+Predictive Analytics: Use sales history for demand forecasting, ordering suggestions, and menu optimization.
+
+Self-Service Kiosk Mode: Turn a tablet into a self-ordering kiosk with customizable branding and voice prompts.
+
+Table Management: For pop-up seating: create floor plans, seat guests, manage tabs, and transfer orders between tables.
+
+UI/UX Guidelines:
+
+Minimalistic, card-based dashboard showing core functions: Sales, Orders, Inventory, Customers, Reports.
+
+Large touch targets and intuitive gestures, suitable for glove or quick-touch operation.
+
+Universal search bar for menu items and customers.
+
+Context-sensitive menus: show only relevant actions (e.g., payment methods appear only during checkout).
+
+High-contrast, accessible design with dark/light modes and customizable brand colors.
+
+Responsive layouts for mobile, tablet, and desktop with consistent navigation patterns.
+
+Progressive disclosure: hide advanced operations until needed.
+
+Include a built-in training mode with tooltips and an interactive tutorial.
+
+Performance & Quality:
+
+Keep initial load time under 2 seconds on a typical 3G connection.
+
+Optimize data fetching using GraphQL with caching and pagination.
+
+Use lazy-loading for heavy components (e.g., reports).
+
+Monitor performance (APM) and implement error tracking (e.g., Sentry).
+
+Ensure modular architecture for future scaling and updates.
+
+Testing & Security:
+
+Unit tests and integration tests for front-end and back-end components.
+
+User acceptance tests (e.g., Cypress) for key workflows.
+
+Secure authentication and authorization flows, proper input validation, and encryption.
+
+Regular vulnerability scans and adherence to OWASP best practices.
+
+Project Deliverables:
+
+Complete source code with documentation.
+
+Dockerfiles and Kubernetes manifests for deployment.
+
+Wireframes/prototypes demonstrating UI design.
+
+Setup scripts and environment configuration.
+
+Automated test suites and a user manual.
