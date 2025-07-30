@@ -21,8 +21,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Category routes
-  app.get('/api/categories', isAuthenticated, async (req, res) => {
+  // Category routes (public for customer interface)
+  app.get('/api/categories', async (req, res) => {
     try {
       const categories = await storage.getCategories();
       res.json(categories);
@@ -43,8 +43,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Menu item routes
-  app.get('/api/menu-items', isAuthenticated, async (req, res) => {
+  // Menu item routes (public for customer interface)
+  app.get('/api/menu-items', async (req, res) => {
     try {
       const { categoryId } = req.query;
       let menuItems;

@@ -4,6 +4,29 @@
 
 This is a web-based Point-of-Sale (POS) application specifically designed for food trucks and micro-restaurants. The application provides a comprehensive solution for managing sales, inventory, menu items, customers, and analytics in a cross-platform environment.
 
+## Recent Changes (January 30, 2025)
+
+✓ **Customer-Facing Interface Implementation**
+- Created three customer interface options:
+  1. Simple menu display (/qr-menu) - View-only menu for counter ordering
+  2. Full customer ordering system (/order) - Complete self-service with cart and checkout
+  3. QR code generator (/qr-generator) - Admin tool to create QR codes for both options
+
+✓ **Dual Payment Integration**
+- Cash at counter option - orders marked for staff payment processing
+- Online card payment integration (Stripe ready)
+- Clear payment method selection in checkout flow
+
+✓ **Real-time Order Synchronization** 
+- Customer orders instantly appear in admin dashboard
+- Unified order management between customer and staff interfaces
+- Order status tracking across both systems
+
+✓ **Public API Endpoints**
+- Made categories and menu items endpoints public for customer access
+- Maintains authentication for admin operations
+- Sample menu data populated (8 items across 4 categories)
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
