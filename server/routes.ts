@@ -178,6 +178,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer order endpoint (no authentication required)
+  const createCustomerOrderSchema = z.object({
+    order: z.object({
+      customerName: z.string(),
+      customerEmail: z.string().nullable().optional(),
+      customerPhone: z.string().nullable().optional(),
+      subtotal: z.number(),
+      tax: z.number(),
+      total: z.number(),
+      paymentMethod: z.enum(['cash', 'card']),
+      status: z.string().default('pending'),
+      notes: z.string().nullable().optional(),
+      orderType: z.string().default('customer-online'),
+    }),
+    items: z.array(z.object({
+      menuItemId: z.string(),
+      quantity: z.number(),
+      price: z.number(),
+      notes: z.string().nullable().optional(),
+    })),
+  });
+
+  app.post('/api/customer-orders', async (req, res) => {
+    try {
+      const { order, items } = createCustomerOrderSchema.parse(req.body);
+      
+      // Generate order number
+      const orderNumber = `WEB-${Date.now().toString().slice(-6)}`;
+      
+      const orderData = {
+        ...order,
+        orderNumber,
+        userId: null, // Customer orders don't have a user ID
+        subtotal: order.subtotal.toString(),
+        tax: order.tax.toString(),
+        total: order.total.toString(),
+      };
+      
+      const newOrder = await storage.createOrder(orderData, items);
+      res.status(201).json(newOrder);
+    } catch (error) {
+      console.error("Error creating customer order:", error);
+      res.status(400).json({ message: "Failed to create order" });
+    }
+  });
+
   app.put('/api/orders/:id/status', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;

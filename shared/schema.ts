@@ -88,8 +88,11 @@ export const orders = pgTable("orders", {
   orderNumber: varchar("order_number").notNull().unique(),
   customerId: uuid("customer_id").references(() => customers.id),
   userId: varchar("user_id").references(() => users.id),
+  customerName: varchar("customer_name"), // For customer orders without account
+  customerEmail: varchar("customer_email"), // For customer orders
+  customerPhone: varchar("customer_phone"), // For customer orders
   status: varchar("status").default("pending"), // pending, preparing, ready, completed, cancelled
-  orderType: varchar("order_type").default("dine-in"), // dine-in, takeout, delivery
+  orderType: varchar("order_type").default("dine-in"), // dine-in, takeout, delivery, customer-online
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   tax: decimal("tax", { precision: 10, scale: 2 }).notNull(),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),

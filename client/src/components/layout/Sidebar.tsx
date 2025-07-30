@@ -7,7 +7,8 @@ import {
   Users, 
   BarChart3, 
   Settings,
-  Wifi
+  Wifi,
+  QrCode
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +43,11 @@ const navigationItems = [
     name: "Reports", 
     href: "/reports", 
     icon: BarChart3 
+  },
+  { 
+    name: "QR Codes", 
+    href: "/qr-generator", 
+    icon: QrCode 
   },
   { 
     name: "Settings", 

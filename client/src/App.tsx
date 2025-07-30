@@ -12,12 +12,20 @@ import Menu from "@/pages/menu";
 import Inventory from "@/pages/inventory";
 import Customers from "@/pages/customers";
 import Reports from "@/pages/reports";
+import CustomerMenu from "@/pages/customer-menu";
+import QRMenu from "@/pages/qr-menu";
+import QRGenerator from "@/pages/qr-generator";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
 
   return (
     <Switch>
+      {/* Public customer-facing routes */}
+      <Route path="/order" component={CustomerMenu} />
+      <Route path="/qr-menu" component={QRMenu} />
+      
+      {/* Admin routes (authentication required) */}
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (
@@ -28,6 +36,7 @@ function Router() {
           <Route path="/inventory" component={Inventory} />
           <Route path="/customers" component={Customers} />
           <Route path="/reports" component={Reports} />
+          <Route path="/qr-generator" component={QRGenerator} />
         </>
       )}
       <Route component={NotFound} />
