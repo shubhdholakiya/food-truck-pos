@@ -2,14 +2,19 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertCategorySchema, insertMenuItemSchema, insertCustomerSchema, insertOrderSchema, insertOrderItemSchema, insertInventoryItemSchema } from "@shared/schema";
+import {
+  insertCategorySchema,
+  insertMenuItemSchema,
+  insertCustomerSchema,
+  insertOrderSchema,
+  insertOrderItemSchema,
+  insertInventoryItemSchema,
+} from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
   await setupAuth(app);
 
-  // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -21,7 +26,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Category routes (public for customer interface)
   app.get('/api/categories', async (req, res) => {
     try {
       const categories = await storage.getCategories();
@@ -43,18 +47,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Menu item routes (public for customer interface)
   app.get('/api/menu-items', async (req, res) => {
     try {
       const { categoryId } = req.query;
-      let menuItems;
-      
-      if (categoryId) {
-        menuItems = await storage.getMenuItemsByCategory(categoryId as string);
-      } else {
-        menuItems = await storage.getMenuItems();
-      }
-      
+      const menuItems = categoryId
+        ? await storage.getMenuItemsByCategory(categoryId as string)
+        : await storage.getMenuItems();
       res.json(menuItems);
     } catch (error) {
       console.error("Error fetching menu items:", error);
@@ -85,7 +83,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Customer routes
   app.get('/api/customers', isAuthenticated, async (req, res) => {
     try {
       const customers = await storage.getCustomers();
@@ -110,14 +107,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/customers/search', isAuthenticated, async (req, res) => {
     try {
       const { email, phone } = req.query;
-      let customer;
-      
-      if (email) {
-        customer = await storage.getCustomerByEmail(email as string);
-      } else if (phone) {
-        customer = await storage.getCustomerByPhone(phone as string);
-      }
-      
+      const customer = email
+        ? await storage.getCustomerByEmail(email as string)
+        : phone
+        ? await storage.getCustomerByPhone(phone as string)
+        : null;
       res.json(customer || null);
     } catch (error) {
       console.error("Error searching customer:", error);
@@ -125,18 +119,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Order routes
   app.get('/api/orders', isAuthenticated, async (req, res) => {
     try {
       const { recent } = req.query;
-      let orders;
-      
-      if (recent) {
-        orders = await storage.getRecentOrders(parseInt(recent as string) || 10);
-      } else {
-        orders = await storage.getOrders();
-      }
-      
+      const orders = recent
+        ? await storage.getRecentOrders(parseInt(recent as string) || 10)
+        : await storage.getOrders();
       res.json(orders);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -148,11 +136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const order = await storage.getOrderWithItems(id);
-      
-      if (!order) {
-        return res.status(404).json({ message: "Order not found" });
-      }
-      
+      if (!order) return res.status(404).json({ message: "Order not found" });
       res.json(order);
     } catch (error) {
       console.error("Error fetching order:", error);
@@ -169,7 +153,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const { order, items } = createOrderSchema.parse(req.body);
-      
       const newOrder = await storage.createOrder({ ...order, userId }, items);
       res.status(201).json(newOrder);
     } catch (error) {
@@ -178,7 +161,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Customer order endpoint (no authentication required)
   const createCustomerOrderSchema = z.object({
     order: z.object({
       customerName: z.string(),
@@ -187,10 +169,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       subtotal: z.number(),
       tax: z.number(),
       total: z.number(),
-      paymentMethod: z.enum(['cash', 'card']),
-      status: z.string().default('pending'),
+      paymentMethod: z.enum(["cash", "card"]),
+      status: z.string().default("pending"),
       notes: z.string().nullable().optional(),
-      orderType: z.string().default('customer-online'),
+      orderType: z.string().default("customer-online"),
     }),
     items: z.array(z.object({
       menuItemId: z.string(),
@@ -203,19 +185,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/customer-orders', async (req, res) => {
     try {
       const { order, items } = createCustomerOrderSchema.parse(req.body);
-      
-      // Generate order number
       const orderNumber = `WEB-${Date.now().toString().slice(-6)}`;
-      
       const orderData = {
         ...order,
         orderNumber,
-        userId: null, // Customer orders don't have a user ID
+        userId: null,
         subtotal: order.subtotal.toString(),
         tax: order.tax.toString(),
         total: order.total.toString(),
       };
-      
       const newOrder = await storage.createOrder(orderData, items);
       res.status(201).json(newOrder);
     } catch (error) {
@@ -228,11 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { status } = req.body;
-      
-      if (!status) {
-        return res.status(400).json({ message: "Status is required" });
-      }
-      
+      if (!status) return res.status(400).json({ message: "Status is required" });
       const order = await storage.updateOrderStatus(id, status);
       res.json(order);
     } catch (error) {
@@ -241,18 +215,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Inventory routes
   app.get('/api/inventory', isAuthenticated, async (req, res) => {
     try {
       const { lowStock } = req.query;
-      let items;
-      
-      if (lowStock === 'true') {
-        items = await storage.getLowStockItems();
-      } else {
-        items = await storage.getInventoryItems();
-      }
-      
+      const items = lowStock === 'true'
+        ? await storage.getLowStockItems()
+        : await storage.getInventoryItems();
       res.json(items);
     } catch (error) {
       console.error("Error fetching inventory:", error);
@@ -275,11 +243,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { quantity } = req.body;
-      
-      if (typeof quantity !== 'number') {
-        return res.status(400).json({ message: "Quantity must be a number" });
-      }
-      
+      if (typeof quantity !== 'number') return res.status(400).json({ message: "Quantity must be a number" });
       const item = await storage.updateInventoryStock(id, quantity);
       res.json(item);
     } catch (error) {
@@ -288,7 +252,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Analytics routes
   app.get('/api/analytics/metrics', isAuthenticated, async (req, res) => {
     try {
       const metrics = await storage.getSalesMetrics();
