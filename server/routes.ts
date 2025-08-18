@@ -14,17 +14,28 @@ import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
+  function getUserId(req: any) {
+  // if auth is disabled locally, fall back to a stable dev id
+  return req?.user?.claims?.sub || process.env.DEV_USER_ID || 'dev-user';
+}
 
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+  try {
+    const userId = getUserId(req);
+
+    // In local dev there may be no user in storage—return a mock
+    const user = (await storage.getUser(userId).catch(() => null)) || {
+      id: userId,
+      name: 'Dev User',
+      email: 'dev@example.com',
+    };
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Failed to fetch user" });
+  }
+});
 
   app.get('/api/categories', async (req, res) => {
     try {
@@ -119,18 +130,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/orders', isAuthenticated, async (req, res) => {
-    try {
-      const { recent } = req.query;
-      const orders = recent
-        ? await storage.getRecentOrders(parseInt(recent as string) || 10)
-        : await storage.getOrders();
-      res.json(orders);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      res.status(500).json({ message: "Failed to fetch orders" });
-    }
-  });
+  app.post('/api/orders', isAuthenticated, async (req: any, res) => {
+  try {
+    const userId = getUserId(req);
+    const { order, items } = createOrderSchema.parse(req.body);
+
+    const newOrder = await storage.createOrder({ ...order, userId }, items);
+    res.status(201).json(newOrder);
+  } catch (error) {
+    console.error("Error creating order:", error);
+    res.status(400).json({ message: "Failed to create order" });
+  }
+});
+
 
   app.get('/api/orders/:id', isAuthenticated, async (req, res) => {
     try {
@@ -194,7 +206,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tax: order.tax.toString(),
         total: order.total.toString(),
       };
-      const newOrder = await storage.createOrder(orderData, items);
+      const transformedItems = items.map((item: any) => ({
+        quantity: item.quantity,
+        unitPrice: item.price.toString(),
+        totalPrice: (item.price * item.quantity).toString(),
+        menuItemId: item.menuItemId,
+        specialInstructions: item.notes || ""
+      }));
+      const newOrder = await storage.createOrder(orderData, transformedItems);
+
+      // const newOrder = await storage.createOrder(orderData, items);
       res.status(201).json(newOrder);
     } catch (error) {
       console.error("Error creating customer order:", error);
@@ -251,6 +272,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: "Failed to update inventory stock" });
     }
   });
+  app.get('/api/login', (req: any, res) => {
+  // When SKIP_REPLIT_AUTH=true we aren't doing real auth; just return OK
+  if (process.env.SKIP_REPLIT_AUTH === 'true') {
+    // You can also set a cookie here if your app expects it.
+    return res.json({ ok: true, message: 'Local dev: auth skipped', user: { id: 'dev-user' } });
+  }
+  // In prod, Replit auth handles login
+  res.status(404).send('Login is handled by Replit in production.');
+});
+
 
   app.get('/api/analytics/metrics', isAuthenticated, async (req, res) => {
     try {
@@ -288,3 +319,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   return httpServer;
 }
+

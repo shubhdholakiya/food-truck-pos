@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
+
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
@@ -24,13 +25,17 @@ function Router() {
       {/* Public customer-facing routes */}
       <Route path="/order" component={CustomerMenu} />
       <Route path="/qr-menu" component={QRMenu} />
-      
+
       {/* Admin routes (authentication required) */}
       {isLoading || !isAuthenticated ? (
+        // While loading or unauthenticated, only expose the landing on "/"
         <Route path="/" component={Landing} />
       ) : (
         <>
+          {/* Root can be dashboard for convenience */}
           <Route path="/" component={Dashboard} />
+          {/* Explicit dashboard path so our login redirect works */}
+          <Route path="/dashboard" component={Dashboard} />
           <Route path="/sales" component={Sales} />
           <Route path="/menu" component={Menu} />
           <Route path="/inventory" component={Inventory} />
@@ -39,6 +44,8 @@ function Router() {
           <Route path="/qr-generator" component={QRGenerator} />
         </>
       )}
+
+      {/* Fallback */}
       <Route component={NotFound} />
     </Switch>
   );

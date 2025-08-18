@@ -14,8 +14,8 @@ export default defineConfig(async () => ({
     runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== "production" && process.env.REPL_ID
       ? [
-          (await import("@replit/vite-plugin-cartographer")).cartographer(),
-        ]
+        (await import("@replit/vite-plugin-cartographer")).cartographer(),
+      ]
       : []),
   ],
   resolve: {
