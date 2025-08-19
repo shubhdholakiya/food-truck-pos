@@ -1,58 +1,97 @@
 import { Link, useLocation } from "wouter";
-import { 
-  LayoutDashboard, 
-  ShoppingCart, 
-  Menu as MenuIcon, 
-  Package, 
-  Users, 
-  BarChart3, 
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  Menu as MenuIcon,
+  Package,
+  Users,
+  BarChart3,
   Settings,
   Wifi,
-  QrCode
+  QrCode,
+  ChefHat,
+  CreditCard,
+  MapPin,
+  User as UserIcon,
+  Receipt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigationItems = [
-  { 
-    name: "Dashboard", 
-    href: "/", 
+  {
+    name: "Dashboard",
+    href: "/",
     icon: LayoutDashboard,
-    exact: true 
+    exact: true,
   },
-  { 
-    name: "Sales", 
-    href: "/sales", 
-    icon: ShoppingCart 
+
+  // New primary pages
+  {
+    name: "Orders",
+    href: "/orders",
+    icon: Receipt,
   },
-  { 
-    name: "Menu", 
-    href: "/menu", 
-    icon: MenuIcon 
+  {
+    name: "Kitchen",
+    href: "/kitchen",
+    icon: ChefHat,
   },
-  { 
-    name: "Inventory", 
-    href: "/inventory", 
-    icon: Package 
+  {
+    name: "Payments",
+    href: "/payments",
+    icon: CreditCard,
   },
-  { 
-    name: "Customers", 
-    href: "/customers", 
-    icon: Users 
+  {
+    name: "Staff",
+    href: "/staff",
+    icon: Users,
   },
-  { 
-    name: "Reports", 
-    href: "/reports", 
-    icon: BarChart3 
+  {
+    name: "Locations",
+    href: "/locations",
+    icon: MapPin,
   },
-  { 
-    name: "QR Codes", 
-    href: "/qr-generator", 
-    icon: QrCode 
+  {
+    name: "Profile",
+    href: "/profile",
+    icon: UserIcon,
   },
-  { 
-    name: "Settings", 
-    href: "/settings", 
-    icon: Settings 
+
+  // Existing pages
+  {
+    name: "Sales",
+    href: "/sales",
+    icon: ShoppingCart,
+  },
+  {
+    name: "Menu",
+    href: "/menu",
+    icon: MenuIcon,
+  },
+  {
+    name: "Inventory",
+    href: "/inventory",
+    icon: Package,
+  },
+  {
+    name: "Customers",
+    href: "/customers",
+    icon: Users,
+  },
+  {
+    name: "Reports",
+    href: "/reports",
+    icon: BarChart3,
+  },
+  {
+    name: "QR Codes",
+    href: "/qr-generator",
+    icon: QrCode,
+  },
+  {
+    name: "Settings",
+    href: "/settings",
+    icon: Settings,
   },
 ];
 
@@ -72,15 +111,17 @@ export default function Sidebar() {
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href, item.exact);
-          
+
           return (
             <Link key={item.name} href={item.href}>
-              <div className={cn(
-                "flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-colors cursor-pointer",
-                active 
-                  ? "bg-primary/10 text-primary" 
-                  : "text-gray-700 hover:bg-gray-100"
-              )}>
+              <div
+                className={cn(
+                  "flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-colors cursor-pointer",
+                  active
+                    ? "bg-primary/10 text-primary"
+                    : "text-gray-700 hover:bg-gray-100"
+                )}
+              >
                 <Icon className="h-5 w-5" />
                 <span>{item.name}</span>
               </div>
@@ -88,7 +129,7 @@ export default function Sidebar() {
           );
         })}
       </nav>
-      
+
       {/* System Status */}
       <div className="absolute bottom-4 left-4 right-4">
         <div className="bg-secondary/10 border border-secondary/20 rounded-lg p-3">
