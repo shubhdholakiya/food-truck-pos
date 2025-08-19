@@ -1,4 +1,8 @@
 import { useEffect } from "react";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
+import { ShoppingCart, ChefHat, CreditCard, Users, MapPin, User } from "lucide-react";
+
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/layout/Sidebar";
@@ -38,16 +42,64 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col bg-surface">
       <TopBar />
-      
+
       <div className="flex flex-1">
+        {/* Yes — this page already has a Sidebar */}
         <Sidebar />
-        
+
         <main className="flex-1 overflow-hidden">
           <div className="p-4 md:p-6">
             {/* Page Header */}
             <div className="mb-6">
               <h2 className="text-2xl font-medium text-gray-900 mb-2">Dashboard</h2>
-              <p className="text-gray-600">Welcome back! Here's what's happening with your food truck today.</p>
+              <p className="text-gray-600">
+                Welcome back! Here's what's happening with your food truck today.
+              </p>
+            </div>
+
+            {/* Quick navigation to the new pages */}
+            <div className="mb-6 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+              <Button asChild variant="secondary" className="justify-start gap-2">
+                <Link href="/orders">
+                  <ShoppingCart className="h-4 w-4" />
+                  <span>Orders</span>
+                </Link>
+              </Button>
+
+              <Button asChild variant="secondary" className="justify-start gap-2">
+                <Link href="/kitchen">
+                  <ChefHat className="h-4 w-4" />
+                  <span>Kitchen</span>
+                </Link>
+              </Button>
+
+              <Button asChild variant="secondary" className="justify-start gap-2">
+                <Link href="/payments">
+                  <CreditCard className="h-4 w-4" />
+                  <span>Payments</span>
+                </Link>
+              </Button>
+
+              <Button asChild variant="secondary" className="justify-start gap-2">
+                <Link href="/staff">
+                  <Users className="h-4 w-4" />
+                  <span>Staff</span>
+                </Link>
+              </Button>
+
+              <Button asChild variant="secondary" className="justify-start gap-2">
+                <Link href="/locations">
+                  <MapPin className="h-4 w-4" />
+                  <span>Locations</span>
+                </Link>
+              </Button>
+
+              <Button asChild variant="secondary" className="justify-start gap-2">
+                <Link href="/profile">
+                  <User className="h-4 w-4" />
+                  <span>Profile</span>
+                </Link>
+              </Button>
             </div>
 
             {/* Key Metrics */}
@@ -60,7 +112,7 @@ export default function Dashboard() {
                 <RecentOrders />
               </div>
 
-              {/* Quick Actions & Alerts */}
+              {/* Quick Actions & Top Items */}
               <div className="space-y-6">
                 <QuickActions />
                 <TopItems />
