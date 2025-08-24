@@ -90,7 +90,7 @@ export async function setupAuth(app: Express) {
       const returnTo =
         typeof req.query.returnTo === "string"
           ? req.query.returnTo
-          : "http://localhost:5173/";
+          : "/";
       // pretend login succeeded then bounce back to the frontend
       return res.redirect(returnTo);
     });
@@ -104,7 +104,7 @@ export async function setupAuth(app: Express) {
       const returnTo =
         typeof req.query.returnTo === "string"
           ? req.query.returnTo
-          : "http://localhost:5173/";
+          : "/";
       req.session.destroy(() => {
         res.redirect(returnTo);
       });
