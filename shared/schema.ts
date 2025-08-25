@@ -208,6 +208,67 @@ export const insertInventoryItemSchema = createInsertSchema(inventoryItems).omit
   updatedAt: true,
 });
 
+// --- Modifiers: groups and options + item linkage ---
+
+export const modifierGroups = pgTable("modifier_groups", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 80 }).notNull(),
+  min: integer("min").notNull().default(0),  // 0 = optional
+  max: integer("max").notNull().default(0),  // 0 = unlimited
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const modifiers = pgTable("modifiers", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  groupId: uuid("group_id").references(() => modifierGroups.id).notNull(),
+  name: varchar("name", { length: 80 }).notNull(),
+  priceDelta: decimal("price_delta", { precision: 10, scale: 2 }).notNull().default("0"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+/** many‑to‑many: which modifier groups apply to which items */
+export const itemModifierGroups = pgTable(
+  "item_modifier_groups",
+  {
+    itemId: uuid("item_id").references(() => menuItems.id).notNull(),
+    groupId: uuid("group_id").references(() => modifierGroups.id).notNull(),
+  },
+  (t) => ({ pk: { primaryKey: true, columns: [t.itemId, t.groupId] } })
+);
+
+// (optional) relations
+export const modifierGroupsRelations = relations(modifierGroups, ({ many }) => ({
+  modifiers: many(modifiers),
+}));
+
+export const modifiersRelations = relations(modifiers, ({ one }) => ({
+  group: one(modifierGroups, {
+    fields: [modifiers.groupId],
+    references: [modifierGroups.id],
+  }),
+}));
+
+// Insert schemas
+export const insertModifierGroupSchema = createInsertSchema(modifierGroups).omit({
+  id: true, createdAt: true, updatedAt: true,
+});
+export const insertModifierSchema = createInsertSchema(modifiers).omit({
+  id: true, createdAt: true, updatedAt: true,
+});
+
+// Types
+export type ModifierGroup = typeof modifierGroups.$inferSelect;
+export type InsertModifierGroup = z.infer<typeof insertModifierGroupSchema>;
+export type Modifier = typeof modifiers.$inferSelect;
+export type InsertModifier = z.infer<typeof insertModifierSchema>;
+
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
